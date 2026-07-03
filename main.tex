@@ -747,4 +747,26 @@ Instead of $\sigma(\Phi(\vx) + c\cdot \ln(b))$, learn a table:
     ML Theory gaps
 \end{frame}
 
+\begin{frame}{Standard RecSys flow}
+\centering
+\begin{tikzpicture}
+    \node[inner sep=0pt] (recsysflow)
+        {\includegraphics[width=.8\textwidth]{fig/recsys_flow.jpg}};
+    \only<2->{
+        \draw[
+            red,
+            line width=7pt,
+            line cap=round,
+            opacity=0.86
+        ]
+            ($(recsysflow.south west)+(0.18,0.18)$)
+            --
+            ($(recsysflow.north east)+(-0.18,-0.18)$)
+            ($(recsysflow.north west)+(0.18,-0.18)$)
+            --
+            ($(recsysflow.south east)+(-0.18,0.18)$);
+    }
+\end{tikzpicture}
+\end{frame}
+
 \end{document}
