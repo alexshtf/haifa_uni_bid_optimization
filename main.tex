@@ -47,6 +47,27 @@
   garr/.style={-{Stealth[length=3mm,width=2.2mm]}, line width=1.0pt, green!50!black},
 }
 
+\newcommand{\continualeventbar}[4]{%
+  \draw[event, fill=#3, opacity=#4] (#1,1.10) rectangle ++(0.08,#2);
+}
+
+\newcommand{\continualbrainset}[2]{%
+  \pic[scale=0.71] at (#1-0.38,#2+0.15) {brain};
+  \pic[scale=0.71] at (#1,#2+0.15) {brain};
+  \pic[scale=0.71] at (#1+0.38,#2+0.15) {brain};
+  \pic[scale=0.71] at (#1-0.19,#2-0.22) {brain};
+  \pic[scale=0.71] at (#1+0.19,#2-0.22) {brain};
+}
+
+\newcommand{\continualprocessoricon}[2]{%
+  \draw[draw=black!80, fill=white, line width=0.55pt] (#1,#2) circle (0.22);
+  \draw[draw=black!75, line width=0.45pt, line cap=round]
+    (#1,#2-0.28) -- (#1,#2+0.28)
+    (#1-0.28,#2) -- (#1+0.28,#2)
+    (#1-0.20,#2-0.20) -- (#1+0.20,#2+0.20)
+    (#1-0.20,#2+0.20) -- (#1+0.20,#2-0.20);
+}
+
 \title{What online advertising reveals about the limits of standard machine learning theory}
 \author{Alex Shtoff}
 \institute{TII - Technology Innovation Institute}
@@ -489,6 +510,177 @@ Business goal - balance {\color{purple}short term revenue} and {\color{blue}long
     \vspace{5em}
     \textbf{$\mathbb{P}\mathbf{(win)}$}: tractable surplus maximization \\
     \textbf{More}: training without human supervision, interpretability, ...
+\end{frame}
+
+\begin{frame}[t]{Continual training and tuning}
+\centering
+\vspace{-0.6em}
+\begin{tikzpicture}[
+  x=1cm,
+  y=1cm,
+  scale=0.95,
+  transform shape,
+  flow/.style={-{Stealth[length=2.4mm,width=1.8mm]}, line width=0.8pt, black!85},
+  thinflow/.style={-{Stealth[length=2.0mm,width=1.5mm]}, line width=0.55pt, black!80},
+  feedback/.style={-{Stealth[length=2.0mm,width=1.5mm]}, dashed, line width=0.7pt, black!70},
+  trainwindow/.style={draw=black!72, rounded corners=1.5mm, line width=0.7pt},
+  currentwindow/.style={draw=black!90, rounded corners=1.5mm, line width=1.0pt},
+  mixedwindow/.style={draw=black!90, rounded corners=1.5mm, line width=1.0pt, dashed},
+  event/.style={draw=black!65, line width=0.2pt, rounded corners=0.25mm},
+  box/.style={draw=black!80, rounded corners=2mm, fill=white, line width=0.8pt, drop shadow},
+  processor/.style={box, fill=gray!8},
+  deployline/.style={draw=black!75, line width=0.7pt, dashed},
+  pics/brain/.style={
+    code={
+      \draw[draw=black!80, fill=white, line width=0.22pt]
+        (-0.18,0.01)
+        .. controls (-0.26,0.09) and (-0.19,0.21) .. (-0.08,0.18)
+        .. controls (-0.03,0.29) and (0.09,0.27) .. (0.12,0.18)
+        .. controls (0.23,0.21) and (0.30,0.10) .. (0.24,0.00)
+        .. controls (0.31,-0.10) and (0.18,-0.21) .. (0.07,-0.16)
+        .. controls (0.02,-0.26) and (-0.12,-0.22) .. (-0.13,-0.13)
+        .. controls (-0.25,-0.18) and (-0.31,-0.05) .. (-0.18,0.01) -- cycle;
+      \draw[draw=black!75, line width=0.16pt, line cap=round]
+        (-0.02,0.20) .. controls (-0.06,0.08) and (-0.05,-0.03) .. (-0.01,-0.16);
+      \draw[draw=black!75, line width=0.16pt, line cap=round]
+        (-0.13,0.10) .. controls (-0.05,0.10) and (-0.06,0.00) .. (-0.11,-0.03);
+      \draw[draw=black!75, line width=0.16pt, line cap=round]
+        (-0.16,-0.07) .. controls (-0.08,-0.05) and (-0.06,-0.12) .. (-0.10,-0.17);
+      \draw[draw=black!75, line width=0.16pt, line cap=round]
+        (0.11,0.12) .. controls (0.04,0.07) and (0.05,0.00) .. (0.13,-0.02);
+      \draw[draw=black!75, line width=0.16pt, line cap=round]
+        (0.17,-0.08) .. controls (0.08,-0.06) and (0.06,-0.13) .. (0.10,-0.18);
+    }
+  }
+]
+  \colorlet{policycyan}{cyan!45}
+  \colorlet{policycyandark}{cyan!65!blue}
+  \colorlet{policypurple}{blue!35!red!45}
+  \colorlet{policypurpledark}{blue!55!red!80}
+  \colorlet{policyorange}{orange!62}
+  \colorlet{policyorangedark}{orange!85!red}
+  \path[use as bounding box] (0,0) rectangle (11.35,5.25);
+
+  % Observed events and time axis.
+  \only<1->{\begin{scope}
+    \draw[flow] (0.65,0.58) -- (11.15,0.58);
+    \node[anchor=north east, font=\scriptsize\bfseries, text=black!75] at (11.08,0.42) {time};
+
+    \continualeventbar{1.02}{0.44}{policycyan}{0.35}
+    \continualeventbar{1.20}{0.67}{policycyandark}{0.92}
+    \continualeventbar{1.43}{0.44}{policycyan}{0.35}
+    \continualeventbar{1.68}{0.44}{policycyan}{0.35}
+    \continualeventbar{1.91}{0.67}{policycyandark}{0.92}
+    \continualeventbar{2.24}{0.44}{policycyan}{0.35}
+    \continualeventbar{2.45}{0.67}{policycyandark}{0.92}
+    \continualeventbar{2.72}{0.44}{policycyan}{0.35}
+    \continualeventbar{3.02}{0.44}{policycyan}{0.35}
+    \continualeventbar{3.27}{0.67}{policycyandark}{0.92}
+    \continualeventbar{3.55}{0.44}{policycyan}{0.35}
+    \continualeventbar{3.82}{0.44}{policycyan}{0.35}
+  \end{scope}}
+
+  % First 30-minute training window.
+  \only<2->{\begin{scope}
+    \draw[currentwindow] (0.85,0.95) rectangle ++(3.15,1.22);
+    \node[font=\scriptsize\bfseries, text=black!75] at (2.43,2.36) {30 min};
+  \end{scope}}
+
+  % Policy serving interval from the first observed block.
+  \only<3->{\begin{scope}
+    \draw[policycyan, line width=4.2pt, line cap=round, opacity=0.45] (0.95,0.30) -- (4.00,0.30);
+    \draw[policycyandark, line width=0.45pt] (0.95,0.30) -- (4.00,0.30);
+  \end{scope}}
+
+  % First tuning run.
+  \only<4->{\begin{scope}
+    \draw[flow] (2.43,2.17) -- (2.43,3.40);
+    \node[font=\scriptsize\bfseries, text=black!80] at (2.43,4.88) {configs};
+    \node[box, minimum width=1.50cm, minimum height=1.05cm] (configsA) at (2.43,4.17) {};
+    \continualbrainset{2.43}{4.15}
+  \end{scope}}
+
+  % Config processing while the next cyan events are still arriving.
+  \only<5->{\begin{scope}
+    \draw[flow] (configsA.east) -- (3.95,4.17);
+    \node[processor, minimum width=0.96cm, minimum height=0.78cm] (procA) at (4.55,4.17) {};
+    \continualprocessoricon{4.55}{4.17}
+
+    \draw[policycyan, line width=4.2pt, line cap=round, opacity=0.45] (4.00,0.30) -- (5.05,0.30);
+    \draw[policycyandark, line width=0.45pt] (4.00,0.30) -- (5.05,0.30);
+
+    \continualeventbar{4.08}{0.44}{policycyan}{0.35}
+    \continualeventbar{4.29}{0.67}{policycyandark}{0.92}
+    \continualeventbar{4.58}{0.44}{policycyan}{0.35}
+    \continualeventbar{4.92}{0.44}{policycyan}{0.35}
+  \end{scope}}
+
+  % Deployment switches production to the purple policy.
+  \only<6->{\begin{scope}
+    \draw[flow] (procA.south) .. controls (4.55,3.05) and (5.05,3.05) .. (5.05,2.18);
+    \draw[deployline] (5.05,0.95) -- (5.05,2.17);
+    \draw[draw=black!80, fill=white, line width=0.6pt] (5.05,0.58) circle (0.10);
+
+    \draw[policypurple, line width=4.2pt, line cap=round, opacity=0.50] (5.05,0.30) -- (7.15,0.30);
+    \draw[policypurpledark, line width=0.45pt] (5.05,0.30) -- (7.15,0.30);
+
+    \continualeventbar{5.18}{0.44}{policypurple}{0.40}
+    \continualeventbar{5.39}{0.67}{policypurpledark}{0.92}
+    \continualeventbar{5.68}{0.44}{policypurple}{0.40}
+    \continualeventbar{5.93}{0.44}{policypurple}{0.40}
+    \continualeventbar{6.25}{0.67}{policypurpledark}{0.92}
+    \continualeventbar{6.49}{0.44}{policypurple}{0.40}
+    \continualeventbar{6.79}{0.67}{policypurpledark}{0.92}
+    \continualeventbar{7.07}{0.44}{policypurple}{0.40}
+  \end{scope}}
+
+  % The next training block contains events from two policies.
+  \only<7->{\begin{scope}
+    \draw[mixedwindow] (4.00,0.95) rectangle ++(3.15,1.22);
+  \end{scope}}
+
+  % Adaptive feedback shapes the next config set while the purple policy continues serving.
+  \only<8->{\begin{scope}
+    \draw[flow] (5.58,2.17) .. controls (5.58,3.05) and (6.68,3.05) .. (6.68,3.40);
+    \node[box, minimum width=1.50cm, minimum height=1.05cm] (configsB) at (6.68,4.17) {};
+    \continualbrainset{6.68}{4.15}
+    \draw[feedback] (procA.north east) .. controls (5.35,5.05) and (6.05,5.05) .. (configsB.north west);
+
+    \draw[policypurple, line width=4.2pt, line cap=round, opacity=0.50] (7.15,0.30) -- (8.20,0.30);
+    \draw[policypurpledark, line width=0.45pt] (7.15,0.30) -- (8.20,0.30);
+
+    \continualeventbar{7.30}{0.44}{policypurple}{0.40}
+    \continualeventbar{7.57}{0.67}{policypurpledark}{0.92}
+    \continualeventbar{7.88}{0.44}{policypurple}{0.40}
+    \continualeventbar{8.14}{0.67}{policypurpledark}{0.92}
+  \end{scope}}
+
+  % Second deployment switches production to the orange policy.
+  \only<9->{\begin{scope}
+    \draw[flow] (configsB.east) -- (8.20,4.17);
+    \node[processor, minimum width=0.96cm, minimum height=0.78cm] (procB) at (8.80,4.17) {};
+    \continualprocessoricon{8.80}{4.17}
+
+    \draw[flow] (procB.south) .. controls (8.80,3.05) and (8.20,3.05) .. (8.20,2.18);
+    \draw[deployline] (8.20,0.95) -- (8.20,2.17);
+    \draw[draw=black!80, fill=white, line width=0.6pt] (8.20,0.58) circle (0.10);
+
+    \draw[policyorange, line width=4.2pt, line cap=round, opacity=0.50] (8.20,0.30) -- (10.65,0.30);
+    \draw[policyorangedark, line width=0.45pt] (8.20,0.30) -- (10.65,0.30);
+
+    \continualeventbar{8.35}{0.44}{policyorange}{0.42}
+    \continualeventbar{8.60}{0.44}{policyorange}{0.42}
+    \continualeventbar{8.86}{0.67}{policyorangedark}{0.92}
+    \continualeventbar{9.14}{0.44}{policyorange}{0.42}
+    \continualeventbar{9.45}{0.44}{policyorange}{0.42}
+    \continualeventbar{9.73}{0.67}{policyorangedark}{0.92}
+    \continualeventbar{10.02}{0.44}{policyorange}{0.42}
+    \continualeventbar{10.25}{0.67}{policyorangedark}{0.92}
+
+    \draw[feedback] (procB.north east) .. controls (9.35,5.05) and (10.05,5.05) .. (10.47,4.55);
+    \node[font=\Large, text=black!50] at (10.72,4.28) {$\cdots$};
+  \end{scope}}
+\end{tikzpicture}
 \end{frame}
 
 \begin{frame}[t]{Some typical models}
