@@ -80,6 +80,14 @@
 \def\vb{\boldsymbol b}
 \def\vv{\boldsymbol v}
 \def\vw{\boldsymbol w}
+\newcommand{\newvalue}[1]{\textcolor{orange!85!black}{\textbf{#1}}}
+\newcommand{\fixedD}{\textcolor{blue}{\textbf{fixed finite $d$}}}
+\newcommand{\finiteK}{\textcolor{red}{\textbf{one finite-$k$ run}}}
+
+\setbeamercolor{data panel}{fg=black,bg=blue!4}
+\setbeamercolor{dict panel}{fg=black,bg=black!3}
+\setbeamercolor{model panel}{fg=black,bg=orange!7}
+\setbeamercolor{theory panel}{fg=black,bg=black!3}
 
 \begin{document}
 
@@ -987,6 +995,147 @@ Instead of $\sigma(\Phi(\vx) + c\cdot \ln(b))$, learn a table:
             ($(recsysflow.south east)+(-0.18,0.18)$);
     }
 \end{tikzpicture}
+\end{frame}
+
+% frame-id: new-values-new-dimensions
+\begin{frame}[t]{New values, new dimensions}
+\vspace{-0.4em}
+\begin{columns}[T,onlytextwidth]
+    \begin{column}{0.63\textwidth}
+        \begin{beamercolorbox}[wd=\linewidth,sep=1.0ex,rounded=true]{data panel}
+            {\bfseries\textcolor{blue!60!black}{Logged events}}
+
+            \vspace{0.25em}
+            \centering
+            \scriptsize
+            \setlength{\tabcolsep}{2.4pt}
+            \renewcommand{\arraystretch}{1.22}
+            \begin{tabular}{@{}c c c c c c c@{}}
+                \textbf{t} & \textbf{y} & \textbf{campaign} & \textbf{product} & \textbf{category} & \textbf{site} & \textbf{device} \\
+                \hline
+                101 & $\bullet$ & c17 & p42 & shoes & news & phone \\
+                102 & $\circ$ & c03 & p91 & travel & mail & laptop \\
+                103 & $\circ$ & c17 & p42 & shoes & shop & phone \\
+                104 & $\bullet$ & c09 & p13 & games & video & tablet \\
+                \only<2->{105 & $\bullet$ &
+                    \newvalue{c31} & \newvalue{p108} &
+                    shoes & news & phone \\}
+            \end{tabular}
+        \end{beamercolorbox}
+    \end{column}
+
+    \begin{column}{0.33\textwidth}
+        \begin{beamercolorbox}[wd=\linewidth,sep=1.0ex,rounded=true]{dict panel}
+            {\bfseries Dictionary}
+
+            \vspace{0.25em}
+            \scriptsize
+            \textbf{before}
+            {\tiny
+            \[
+                \begin{array}{@{}l@{}}
+                \text{campaign: c03, c09, c17} \\
+                \text{product: p13, p42, p91}
+                \end{array}
+            \]
+            }
+
+            \only<3->{%
+                \vspace{-0.4em}
+                \textbf{after}
+                {\tiny
+                \[
+                    \begin{array}{@{}l@{}}
+                    \text{campaign: c03, c09, c17, }\newvalue{c31} \\
+                    \text{product: p13, p42, p91, }\newvalue{p108}
+                    \end{array}
+                \]
+                }
+            }
+        \end{beamercolorbox}
+    \end{column}
+\end{columns}
+
+\only<3->{%
+    \vspace{0.7em}
+    \noindent\makebox[\linewidth][c]{%
+    \begin{minipage}{0.97\linewidth}
+    \begin{beamercolorbox}[wd=\linewidth,sep=1.0ex]{model panel}
+        {\bfseries Model update}
+
+        \vspace{0.25em}
+        \centering
+        \begin{tikzpicture}[
+            x=1cm,
+            y=1cm,
+            every node/.style={font=\scriptsize},
+            oldpart/.style={draw=black!22, fill=blue!7, rounded corners=1mm, line width=0.35pt},
+            newpart/.style={draw=orange!70!black, fill=orange!18, rounded corners=1mm, line width=0.45pt},
+        ]
+            \path[use as bounding box] (0,0) rectangle (9.75,1.45);
+
+            \node[anchor=east, font=\scriptsize\bfseries] at (0.95,1.08) {$\theta_t$};
+            \draw[oldpart] (1.10,0.86) rectangle (8.35,1.30);
+            \node[text=black!78] at (4.72,1.08) {shared parameters and already-seen feature coordinates};
+
+            \node[anchor=east, font=\scriptsize\bfseries] at (0.95,0.32) {$\theta_{t+1}$};
+            \draw[oldpart] (1.10,0.10) rectangle (7.10,0.54);
+            \node[text=black!78] at (4.10,0.32) {same parameters, usually warm-started};
+            \draw[newpart] (7.24,0.10) rectangle (9.65,0.54);
+            \node[text=orange!85!black, font=\scriptsize\bfseries] at (8.45,0.32) {new coordinates};
+
+            \node[anchor=west, font=\tiny, text=black!56]
+                at (7.30,0.69) {c31, p108, interactions};
+        \end{tikzpicture}
+    \end{beamercolorbox}
+    \end{minipage}}
+}
+\end{frame}
+
+% frame-id: convergence-analysis-growing-system
+\begin{frame}[t]{Convergence analysis?}
+\vspace{-0.2em}
+\begin{columns}[T,onlytextwidth]
+    \begin{column}{0.52\textwidth}
+        \begin{beamercolorbox}[wd=\linewidth,sep=1.1ex,rounded=true]{theory panel}
+            \small
+            Assume model parameters $\theta \in \mathbb{R}^{\color{blue}d}$. \\
+            Training proceeds in iterations. \\
+            After ${\color{red}k}$ training iterations we obtain a trained model $\hat{\theta}$.
+
+            \[
+                R(\hat{\theta}) - R(\theta^{*}) \leq T({\color{blue}d}, {\color{red}k}).
+            \]
+        \end{beamercolorbox}
+    \end{column}
+
+    \begin{column}{0.44\textwidth}
+        \uncover<2->{%
+            \begin{beamercolorbox}[wd=\linewidth,sep=1.1ex,rounded=true]{theory panel}
+                {\bfseries If we want useful optimizer theory...}
+
+                \vspace{0.45em}
+                \small
+                \textcolor{blue}{Coarse idealization}
+
+                Treating \fixedD, arbitrary initialization, and
+                \finiteK{} as the \emph{whole optimization problem}.
+            \end{beamercolorbox}
+        }
+    \end{column}
+\end{columns}
+
+\uncover<2->{%
+    \vspace{0.85em}
+    \begin{beamercolorbox}[wd=\linewidth,sep=1.15ex,rounded=true]{theory panel}
+        {\bfseries Implication}
+
+        \vspace{0.3em}
+        \centering
+        \large
+        This may require a different theoretical object.
+    \end{beamercolorbox}
+}
 \end{frame}
 
 \end{document}
