@@ -92,6 +92,7 @@
 \end{tabular}
 }
 
+% frame-id: techradar-ad-example
 \begin{frame}
     \includegraphics[width=\textwidth]{fig/techradar_ad_example.png}
     \begin{tikzpicture}[overlay, remember picture]
@@ -100,11 +101,13 @@
 \end{frame}
 
 
+% frame-id: standard-recsys-flow-intro
 \begin{frame}{Standard RecSys flow}
     \centering
     \includegraphics[width=.8\textwidth]{fig/recsys_flow.jpg}
 \end{frame}
 
+% frame-id: model-training
 \begin{frame}{Model training}
     \begin{block}{Train}
         Sample $x_1, \ldots, x_N \sim \mathcal{D}$.
@@ -119,6 +122,7 @@
     \end{block}
 \end{frame}
 
+% frame-id: convergence-analysis
 \begin{frame}[t]{Convergence analysis}
     Assume model parameters $\theta \in \mathbb{R}^{\color{blue}d}$. \\
     Training proceeds in iterations (epochs / mini-baches). \\
@@ -128,6 +132,7 @@
     \]
 \end{frame}
 
+% frame-id: agenda
 \begin{frame}[t]{Agenda}
     \begin{itemize}
         \item Advertising via bid optimization problem
@@ -136,6 +141,7 @@
     \end{itemize}
 \end{frame}
 
+% frame-id: ad-auction-candidate-set
 \begin{frame}
 \centering
 \begin{tikzpicture}
@@ -180,6 +186,7 @@
 \end{tikzpicture}%
 \end{frame}
 
+% frame-id: rtb-ecosystem
 \begin{frame}
     \centering
     \begin{tikzpicture}
@@ -210,6 +217,7 @@
     \end{tikzpicture}
 \end{frame}
 
+% frame-id: dsp-objective
 \begin{frame}
     \centering
     \begin{tikzpicture}[remember picture]
@@ -232,6 +240,7 @@
     \color{blue}{Objective - in {\color{red}\emph{a few milliseconds}}, select an \textbf{ad} coupled with a \textbf{bid}}
 \end{frame}
 
+% frame-id: primary-sources-of-revenue
 \begin{frame}[t]{Primary sources of revenue}
 \begin{itemize}
     \item \color{purple}{Transaction fees (take rate)}
@@ -244,6 +253,7 @@
 Business goal - balance {\color{purple}short term revenue} and {\color{blue}long term satisfaction}.
 \end{frame}
 
+% frame-id: bid-choice-objective
 \begin{frame}[t]{How are bids chosen?}
     \begin{itemize}
         \item \pause Advertiser sets an \emph{objective}\pause, for example:
@@ -267,6 +277,7 @@ Business goal - balance {\color{purple}short term revenue} and {\color{blue}long
     \]
 \end{frame}
 
+% frame-id: utility-example-acpp
 \begin{frame}[t]{Utility example - avg cost per purchase}
     \pause
     Objective: pay at most $\alpha = \$10$ for each purchase on average.
@@ -316,6 +327,7 @@ Business goal - balance {\color{purple}short term revenue} and {\color{blue}long
     \end{tikzpicture}
 \end{frame}
 
+% frame-id: dsp-ad-choice-ideal-vs-practice
 \begin{frame}[t]{DSP ad choice - ideal vs practice}
 \begin{tikzpicture}
     \node[longlist,anchor=north,fill=blue!15,minimum width=15mm,inner sep=2mm] (catalogue) {\underline{\textbf{Catalogue}} \\ \\ Ad 1 \\ Ad 2 \\ $\vdots$ };
@@ -341,6 +353,7 @@ Business goal - balance {\color{purple}short term revenue} and {\color{blue}long
 \end{frame}
 
 
+% frame-id: questions-break
 \begin{frame}
     \centering
     \Huge
@@ -352,6 +365,7 @@ Business goal - balance {\color{purple}short term revenue} and {\color{blue}long
 \end{frame}
 
 
+% frame-id: huge-catalogue-ranking-challenge
 \begin{frame}{Challenge - ranking a huge catalogue in milliseconds}
     \begin{tikzpicture}[
       font=\small,
@@ -415,6 +429,7 @@ Business goal - balance {\color{purple}short term revenue} and {\color{blue}long
 \end{frame}
 
 
+% frame-id: model-freshness
 \begin{frame}
     \centering
     \emph{Model freshness} is crucial for predictive accuracy
@@ -449,6 +464,7 @@ Business goal - balance {\color{purple}short term revenue} and {\color{blue}long
     {\color{blue}Fast training} is essential for performance
 \end{frame}
 
+% frame-id: model-design-tradeoffs
 \begin{frame}
     \begin{tikzpicture}[
       font=\small,
@@ -512,6 +528,7 @@ Business goal - balance {\color{purple}short term revenue} and {\color{blue}long
     \textbf{More}: training without human supervision, interpretability, ...
 \end{frame}
 
+% frame-id: continual-training-tuning
 \begin{frame}[t]{Continual training and tuning}
 \centering
 \vspace{-0.6em}
@@ -683,6 +700,7 @@ Business goal - balance {\color{purple}short term revenue} and {\color{blue}long
 \end{tikzpicture}
 \end{frame}
 
+% frame-id: typical-models
 \begin{frame}[t]{Some typical models}
     \pause
     \begin{block}{Factorization machines [Rendle et. al. 2016]}
@@ -706,6 +724,7 @@ Business goal - balance {\color{purple}short term revenue} and {\color{blue}long
     MANY more (DCN, DCNv2, Deep\&Wide, DeepFM, ...)
 \end{frame}
 
+% frame-id: win-rate-prediction-models
 \begin{frame}[t]{Win rate prediction models}\pause
     \begin{center}
     \includegraphics[width=.8\textwidth]{fig/utility_maximization.png}        
@@ -713,6 +732,7 @@ Business goal - balance {\color{purple}short term revenue} and {\color{blue}long
     $\mathbb{P}(\mathrm{win}| \vx, b)$ HAS to be a fast-to-compute function of $b$!
 \end{frame}
 
+% frame-id: bid-shading-log-sigmoid
 \begin{frame}[t]
     Bid Shading by Win-Rate Estimation and Surplus Maximization (2020, Pan et. al.):
     \[
@@ -729,6 +749,7 @@ Business goal - balance {\color{purple}short term revenue} and {\color{blue}long
     \includegraphics[width=.5\textwidth]{fig/pwins_log_sigmoid.png}
 \end{frame}
 
+% frame-id: meow-logit-table
 \begin{frame}[t]
 \textit{MEOW: A space-efficient nonparametric bid shading algorithm} (2021, Zhang et. al.) 
 
@@ -741,12 +762,14 @@ Instead of $\sigma(\Phi(\vx) + c\cdot \ln(b))$, learn a table:
 \end{frame}
 
 
+% frame-id: ml-theory-gaps
 \begin{frame}
     \Huge
     \centering
     ML Theory gaps
 \end{frame}
 
+% frame-id: standard-recsys-flow-crossed
 \begin{frame}{Standard RecSys flow}
 \centering
 \begin{tikzpicture}
