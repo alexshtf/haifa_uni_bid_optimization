@@ -1,6 +1,6 @@
 \documentclass{beamer}
 \usepackage{tikz}
-\usetikzlibrary{arrows.meta, positioning, fit, shadows, backgrounds, calc, shapes.symbols, shapes.callouts, overlay-beamer-styles, decorations.pathmorphing}
+\usetikzlibrary{arrows.meta, positioning, fit, shadows, backgrounds, calc, matrix, shapes.symbols, shapes.callouts, overlay-beamer-styles, decorations.pathmorphing}
 \makeatletter
 \def\tikzopacityregister{1}
 \tikzset{
@@ -697,6 +697,203 @@ Business goal - balance {\color{purple}short term revenue} and {\color{blue}long
     \draw[feedback] (procB.north east) .. controls (9.35,5.05) and (10.05,5.05) .. (10.47,4.55);
     \node[font=\Large, text=black!50] at (10.72,4.28) {$\cdots$};
   \end{scope}}
+\end{tikzpicture}
+\end{frame}
+
+% frame-id: feature-encoding-table
+\begin{frame}[t]{What kind of data?}
+\centering
+\vspace{-0.6em}
+\begin{tikzpicture}[
+  x=1cm,
+  y=1cm,
+  group header/.style={draw=black!24, line width=0.28pt},
+  feature card/.style={
+    draw=black!22,
+    rounded corners=1.5mm,
+    line width=0.45pt,
+    drop shadow,
+    minimum height=1.68cm
+  },
+  chip/.style={
+    draw=black!24,
+    rounded corners=0.8mm,
+    line width=0.28pt,
+    fill=white,
+    inner xsep=0.9mm,
+    inner ysep=0.75mm,
+    font=\tiny\bfseries,
+    text=black!88
+  },
+]
+  \colorlet{featuread}{cyan!55!blue}
+  \colorlet{featureadsoft}{cyan!14}
+  \colorlet{featurectx}{blue!50!red!70}
+  \colorlet{featurectxsoft}{blue!12!red!12}
+  \colorlet{featuretarget}{red!70}
+  \colorlet{featuretargetsoft}{red!10}
+  \path[use as bounding box] (0,0) rectangle (10.65,5.75);
+
+  \node[anchor=east, font=\scriptsize\bfseries, text=black!58]
+    at (10.42,5.60) {logged events $\to$ sparse field vectors};
+
+  \coordinate (table-nw) at (0.70,5.08);
+
+  \foreach \idx/\x in {
+    0/0,
+    1/0.72,
+    2/2.07,
+    3/3.32,
+    4/4.67,
+    5/5.92,
+    6/7.27,
+    7/8.77,
+    8/10.22
+  } {
+    \coordinate (col\idx) at ($(table-nw)+(\x,0)$);
+  }
+
+  \foreach \idx/\y in {
+    0/0,
+    1/-0.42,
+    2/-0.96,
+    3/-1.50,
+    4/-2.04,
+    5/-2.58,
+    6/-3.12
+  } {
+    \coordinate (row\idx) at ($(table-nw)+(0,\y)$);
+  }
+
+  \draw[group header, fill=featuretargetsoft] (col0 |- row0) rectangle (col1 |- row1);
+  \draw[group header, fill=featureadsoft] (col1 |- row0) rectangle (col4 |- row1);
+  \draw[group header, fill=featurectxsoft] (col4 |- row0) rectangle (col8 |- row1);
+  \node[font=\scriptsize\bfseries, text=black!85] at ($(col0 |- row0)!0.5!(col1 |- row1)$) {$y$};
+  \node[font=\scriptsize\bfseries, text=black!85] at ($(col1 |- row0)!0.5!(col4 |- row1)$) {$x_{\mathrm{ad}}$};
+  \node[font=\scriptsize\bfseries, text=black!85] at ($(col4 |- row0)!0.5!(col8 |- row1)$) {$x_{\mathrm{ctx}}$};
+
+  \draw[draw=black!24, line width=0.28pt, fill=white]
+    (col0 |- row1) rectangle (col1 |- row6);
+  \draw[draw=black!24, line width=0.28pt, fill=featureadsoft]
+    (col1 |- row1) rectangle (col4 |- row6);
+  \draw[draw=black!24, line width=0.28pt, fill=featurectxsoft]
+    (col4 |- row1) rectangle (col8 |- row6);
+
+  \foreach \col in {0,...,8} {
+    \draw[draw=black!24, line width=0.28pt] (col\col |- row1) -- (col\col |- row6);
+  }
+  \foreach \row in {1,...,6} {
+    \draw[draw=black!24, line width=0.28pt] (col0 |- row\row) -- (col8 |- row\row);
+  }
+
+  \foreach \col/\label in {
+    0/event,
+    1/campaign,
+    2/product,
+    3/category,
+    4/site,
+    5/device,
+    6/time,
+    7/geo
+  } {
+    \pgfmathtruncatemacro{\nextcol}{\col+1}
+    \node[font=\tiny\bfseries, text=black!90]
+      at ($(col\col |- row1)!0.5!(col\nextcol |- row2)$) {\label};
+  }
+
+  \foreach \row/\event/\campaign/\product/\category/\site/\device/\time/\geo in {
+    2/{\textcolor{featuretarget}{$\bullet$}}/c17/p42/shoes/news/phone/evening/north,
+    3/{\textcolor{featuretarget}{$\circ$}}/c03/p91/travel/mail/laptop/morning/center,
+    4/{\textcolor{featuretarget}{$\circ$}}/c17/p42/shoes/shop/phone/noon/south,
+    5/{\textcolor{featuretarget}{$\bullet$}}/c09/p13/games/video/tablet/night/north
+  } {
+    \pgfmathtruncatemacro{\nextrow}{\row+1}
+    \foreach \col/\value in {
+      0/\event,
+      1/\campaign,
+      2/\product,
+      3/\category,
+      4/\site,
+      5/\device,
+      6/\time,
+      7/\geo
+    } {
+      \pgfmathtruncatemacro{\nextcol}{\col+1}
+      \node[font=\scriptsize, text=black!90]
+        at ($(col\col |- row\row)!0.5!(col\nextcol |- row\nextrow)$) {\value};
+    }
+  }
+
+  \only<2->{%
+    \fill[green!35!white, opacity=0.18]
+      (col0 |- row2) rectangle (col8 |- row3);
+    \draw[green!50!black, line width=0.8pt]
+      (col0 |- row2) rectangle (col8 |- row3);
+  }
+
+  \only<2>{%
+    \node[feature card, fill=featureadsoft, minimum width=4.55cm, anchor=north west]
+      (adcard) at ([xshift=0.50cm, yshift=-0.55cm]col0 |- row6) {};
+    \node[anchor=north west, font=\scriptsize\bfseries, text=featuread!80!black]
+      at ([xshift=0.16cm, yshift=-0.13cm]adcard.north west) {$x_{\mathrm{ad}}$};
+    \matrix [
+      matrix of nodes,
+      nodes=chip,
+      ampersand replacement=\&,
+      row sep=1.65mm,
+      column sep=1.9mm,
+      anchor=north west,
+    ] at ([xshift=0.16cm, yshift=-0.48cm]adcard.north west) {
+      campaign=c17 \& product=p42 \\
+      category=shoes \\
+    };
+
+    \node[feature card, fill=featurectxsoft, minimum width=4.75cm, anchor=north east]
+      (ctxcard) at ([xshift=-0.10cm, yshift=-0.55cm]col8 |- row6) {};
+    \node[anchor=north west, font=\scriptsize\bfseries, text=featurectx!85!black]
+      at ([xshift=0.16cm, yshift=-0.13cm]ctxcard.north west) {$x_{\mathrm{ctx}}$};
+    \matrix [
+      matrix of nodes,
+      nodes=chip,
+      ampersand replacement=\&,
+      row sep=1.65mm,
+      column sep=1.9mm,
+      anchor=north west,
+    ] at ([xshift=0.16cm, yshift=-0.48cm]ctxcard.north west) {
+      site=news \& device=phone \\
+      time=evening \& geo=north \\
+    };
+  }
+
+  \only<3->{%
+    \node[font=\scriptsize\bfseries, text=black!82] (vectorlabel)
+      at ([yshift=-0.95cm]col4 |- row6)
+      {$\vx = (x_{\mathrm{ad}}, x_{\mathrm{ctx}})$: only a few active coordinates per row};
+    \node[
+      draw=black!25,
+      fill=black!2,
+      rounded corners=1mm,
+      line width=0.35pt,
+      minimum width=4.35cm,
+      minimum height=0.58cm,
+      below=1.1mm of vectorlabel
+    ] (vectorbox) {};
+    \foreach \i in {0,...,23} {
+      \pgfmathsetmacro{\bx}{-1.93+0.16*\i}
+      \draw[fill=black!12, draw=none, rounded corners=0.4mm]
+        ($(vectorbox.center)+(\bx,-0.15)$) rectangle ++(0.10,0.30);
+    }
+    \foreach \i in {1,4,6} {
+      \pgfmathsetmacro{\bx}{-1.93+0.16*\i}
+      \draw[fill=featuread, draw=none, rounded corners=0.4mm]
+        ($(vectorbox.center)+(\bx,-0.15)$) rectangle ++(0.10,0.30);
+    }
+    \foreach \i in {10,12,14,17} {
+      \pgfmathsetmacro{\bx}{-1.93+0.16*\i}
+      \draw[fill=featurectx, draw=none, rounded corners=0.4mm]
+        ($(vectorbox.center)+(\bx,-0.15)$) rectangle ++(0.10,0.30);
+    }
+  }
 \end{tikzpicture}
 \end{frame}
 
