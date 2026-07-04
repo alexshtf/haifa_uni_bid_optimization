@@ -83,6 +83,14 @@
 \newcommand{\newvalue}[1]{\textcolor{orange!85!black}{\textbf{#1}}}
 \newcommand{\fixedD}{\textcolor{blue}{\textbf{fixed finite $d$}}}
 \newcommand{\finiteK}{\textcolor{red}{\textbf{one finite-$k$ run}}}
+\newcommand{\sectiontitleframe}[1]{%
+\begin{frame}[plain]
+\vfill
+\centering
+{\Huge\bfseries\textcolor{blue!65!black}{#1}}
+\vfill
+\end{frame}
+}
 
 \setbeamercolor{data panel}{fg=black,bg=blue!4}
 \setbeamercolor{dict panel}{fg=black,bg=black!3}
@@ -148,6 +156,11 @@
         \item My personal angle - why ``simple'' models are useful.
     \end{itemize}
 \end{frame}
+
+\section{Bid optimization problem}
+% frame-id: section-bid-optimization
+\sectiontitleframe
+    {Bid optimization\\problem}
 
 % frame-id: ad-auction-candidate-set
 \begin{frame}
@@ -967,12 +980,10 @@ Instead of $\sigma(\Phi(\vx) + c\cdot \ln(b))$, learn a table:
 \end{frame}
 
 
-% frame-id: ml-theory-gaps
-\begin{frame}
-    \Huge
-    \centering
-    ML Theory gaps
-\end{frame}
+\section{ML theory gaps}
+% frame-id: section-ml-theory-gaps
+\sectiontitleframe
+    {ML theory gaps}
 
 % frame-id: standard-recsys-flow-crossed
 \begin{frame}{Standard RecSys flow}
