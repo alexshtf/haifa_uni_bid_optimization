@@ -1008,6 +1008,276 @@ Instead of $\sigma(\Phi(\vx) + c\cdot \ln(b))$, learn a table:
 \end{tikzpicture}
 \end{frame}
 
+% frame-id: selection-bias-logged-actions
+\begin{frame}[t]{Selection bias}
+\centering
+\vspace{0.45em}
+\begin{tikzpicture}[
+    scale=0.88,
+    transform shape,
+    flowbox/.style={
+        draw=black, rounded corners=2mm, very thick,
+        minimum width=30mm, minimum height=13mm,
+        align=center, inner sep=2mm, text=black
+    },
+    action/.style={
+        draw=red!35, rounded corners=2mm, very thick,
+        minimum width=27mm, minimum height=10mm,
+        align=center, inner sep=1.6mm, fill=red!6,
+        text=red!70!black
+    },
+    selected/.style={
+        action, draw=green!45!black, fill=green!9, text=black
+    },
+    arr/.style={-{Stealth[length=2.3mm,width=1.8mm]}, line width=0.9pt, draw=black!55},
+]
+    \node[flowbox, fill=orange!9] (ctx) at (0,0)
+        {\textbf{context features}\\[0.25em]$\vx_{\mathrm{ctx}}^{(t)}$};
+    \node[flowbox, fill=green!9, right=10mm of ctx] (policy)
+        {\textbf{deployed model}\\[-0.05em]{\scriptsize logging policy}\\[0.25em]\textbf{chooses }$a^{(t)}$};
+    \node[flowbox, fill=blue!8, right=10mm of policy] (log)
+        {\textbf{log}\\[0.25em]$(\vx_{\mathrm{ctx}}^{(t)}, a^{(t)}, y^{(t)})$};
+
+    \draw[arr] (ctx) -- (policy);
+    \draw[arr] (policy) -- (log);
+
+    \node[action, below=9mm of ctx] (a1) {$a_1$\\[-0.1em]{\tiny no $y$}};
+    \node[selected, right=3mm of a1] (a2) {$a^{(t)}$\\[-0.1em]{\tiny observed $y$}};
+    \node[action, right=3mm of a2] (a3) {$a_3$\\[-0.1em]{\tiny no $y$}};
+    \node[action, right=3mm of a3] (adots) {$\cdots$\\[-0.1em]{\tiny no $y$}};
+\end{tikzpicture}
+
+\vspace{0.7em}
+\begin{tikzpicture}[
+    note/.style={
+        rounded corners=2mm, minimum height=16mm,
+        align=left, inner xsep=6mm, inner ysep=2mm,
+        font=\bfseries
+    },
+    softnote/.style={
+        note, draw=black!15, fill=black!2, text=black
+    },
+    rednote/.style={
+        note, draw=none, fill=red!6, text=black
+    }
+]
+    \node[rednote, minimum width=48mm, anchor=west] (train) at (0,0)
+        {training data\\= logged actions};
+    \draw[red!75!black, line width=1.1mm]
+        (train.north west) -- (train.south west);
+
+    \node[softnote, minimum width=48mm, anchor=west] at ([xshift=7mm]train.east)
+        {not logged $\Rightarrow$ no label};
+\end{tikzpicture}
+\end{frame}
+
+% frame-id: textbook-propensity-correction
+\begin{frame}[t]{Textbook correction: randomize + log $\pi$}
+\centering
+\vspace{0.45em}
+\begin{tikzpicture}[
+    scale=0.88,
+    transform shape,
+    flowbox/.style={
+        draw=black, rounded corners=2mm, very thick,
+        minimum width=30mm, minimum height=13mm,
+        align=center, inner sep=2mm, text=black
+    },
+    action/.style={
+        draw=red!35, rounded corners=2mm, very thick,
+        minimum width=27mm, minimum height=10mm,
+        align=center, inner sep=1.6mm, fill=red!6,
+        text=red!70!black
+    },
+    selected/.style={
+        action, draw=green!45!black, fill=green!9, text=black
+    },
+    arr/.style={-{Stealth[length=2.3mm,width=1.8mm]}, line width=0.9pt, draw=black!55},
+]
+    \node[flowbox, fill=orange!9] (ctx) at (0,0)
+        {\textbf{context features}\\[0.25em]$\vx_{\mathrm{ctx}}$};
+    \node[flowbox, fill=green!9, right=10mm of ctx] (policy)
+        {\textbf{randomized}\\\textbf{deployed model}\\[0.25em]$a \sim \pi(a\mid \vx_{\mathrm{ctx}})$};
+    \node[flowbox, fill=blue!8, right=10mm of policy] (log)
+        {\textbf{log}\\[0.25em]$(\vx_{\mathrm{ctx}}, a, y, \pi)$};
+
+    \draw[arr] (ctx) -- (policy);
+    \draw[arr] (policy) -- (log);
+
+    \node[action, below=9mm of ctx] (a1)
+        {$a_1$\\[-0.1em]{\tiny $\pi(a_1\mid \vx_{\mathrm{ctx}})$}};
+    \node[selected, right=3mm of a1] (a2)
+        {$a$\\[-0.1em]{\tiny logged $\pi$}};
+    \node[action, right=3mm of a2] (a3)
+        {$a_3$\\[-0.1em]{\tiny $\pi(a_3\mid \vx_{\mathrm{ctx}})$}};
+    \node[action, right=3mm of a3] (adots)
+        {$\cdots$\\[-0.1em]{\tiny $\pi>0$}};
+\end{tikzpicture}
+
+\vspace{0.55em}
+\begin{tikzpicture}[
+    note/.style={
+        rounded corners=2mm, minimum height=19mm,
+        align=left, inner xsep=6mm, inner ysep=2mm,
+        font=\bfseries
+    },
+    rednote/.style={
+        note, draw=none, fill=red!6, text=black
+    },
+    weightnote/.style={
+        note, draw=none, fill=black!2, text=black,
+        align=center, font=\normalfont
+    }
+]
+    \node[rednote, minimum width=48mm, anchor=west] (known) at (0,0)
+        {known\\selection probability};
+    \draw[red!75!black, line width=1.1mm]
+        (known.north west) -- (known.south west);
+
+    \node[weightnote, minimum width=48mm, anchor=west] at ([xshift=7mm]known.east)
+        {\textbf{training weight:}\\[0.25em]
+        $\displaystyle w(\vx_{\mathrm{ctx}},a)
+        =
+        \frac{1}{\pi(a\mid \vx_{\mathrm{ctx}})}$};
+\end{tikzpicture}
+
+\vfill
+{\scriptsize\color{black!58}
+Swaminathan and Joachims,
+\emph{Counterfactual Risk Minimization: Learning from Logged Bandit Feedback}, 2015.}
+\end{frame}
+
+% frame-id: bid-optimization-logged-data
+\begin{frame}[t]{Bid optimization: what gets logged?}
+\centering
+\vspace{0.45em}
+\begin{tikzpicture}[
+    scale=0.88,
+    transform shape,
+    flowbox/.style={
+        draw=black, rounded corners=2mm, very thick,
+        minimum width=30mm, minimum height=13mm,
+        align=center, inner sep=2mm, text=black
+    },
+    action/.style={
+        draw=red!35, rounded corners=2mm, very thick,
+        minimum width=40mm, minimum height=8mm,
+        text width=37mm, align=left, inner sep=1.4mm, fill=red!6,
+        text=red!70!black
+    },
+    selected/.style={
+        action, draw=green!45!black, fill=green!9, text=black
+    },
+    panelbox/.style={
+        draw=black!25, rounded corners=2mm, line width=0.6pt,
+        fill=white, inner sep=3mm
+    },
+    arr/.style={-{Stealth[length=2.3mm,width=1.8mm]}, line width=0.9pt, draw=black!55},
+]
+    \node[flowbox, fill=orange!9] (ctx) at (0,0)
+        {\textbf{bid request}\\[0.25em]$\vx_{\mathrm{ctx}}^{(t)}$};
+    \node[flowbox, fill=green!9, right=10mm of ctx] (policy)
+        {\textbf{deployed optimizer}\\[0.25em]$(a^{(t)}, b^{(t)})=\argmax$};
+    \node[flowbox, fill=blue!8, right=10mm of policy] (log)
+        {\textbf{log}\\[0.25em]$(\vx_{\mathrm{ctx}}^{(t)}, a^{(t)}, b^{(t)}, y^{(t)})$};
+
+    \draw[arr] (ctx) -- (policy);
+    \draw[arr] (policy) -- (log);
+
+    \node[panelbox, below=10mm of ctx, minimum width=50mm, minimum height=38mm] (ads) {};
+    \node[anchor=north west, font=\scriptsize\bfseries, text=blue!65!black]
+        at ([xshift=2mm,yshift=-2mm]ads.north west) {candidate ads};
+    \node[action, anchor=north west] at ([xshift=3mm,yshift=-8mm]ads.north west)
+        {$a_1$\hfill{\tiny not served}};
+    \node[selected, anchor=north west] at ([xshift=3mm,yshift=-17mm]ads.north west)
+        {$a^{(t)}$\hfill{\tiny selected}};
+    \node[action, anchor=north west] at ([xshift=3mm,yshift=-26mm]ads.north west)
+        {$a_3$\hfill{\tiny not served}};
+
+    \node[
+        draw=none,
+        fill=red!6,
+        text=black,
+        anchor=north west,
+        minimum width=60mm,
+        minimum height=38mm,
+        align=left,
+        inner sep=4mm
+    ] at ([xshift=8mm]ads.north east)
+        {\textbf{optimizer}\\[0.25em]\Large$\neq$\\[0.25em]\textbf{known lottery}};
+\end{tikzpicture}
+\end{frame}
+
+% frame-id: joint-ad-bid-exploration
+\begin{frame}[t]{Exploration must cover the joint action}
+\centering
+\vspace{0.25em}
+\begin{tikzpicture}[
+    scale=0.88,
+    transform shape,
+    adbox/.style={
+        draw=red!35, rounded corners=2mm, very thick,
+        minimum width=39mm, minimum height=7.5mm,
+        text width=36mm, align=left, inner sep=1.2mm, fill=red!6,
+        text=red!70!black
+    },
+    selected/.style={
+        adbox, draw=green!45!black, fill=green!9, text=black
+    },
+    panel/.style={
+        draw=black!25, rounded corners=2mm, line width=0.7pt,
+        fill=white, inner sep=3mm
+    },
+    note/.style={
+        draw=black!18, rounded corners=2mm, fill=red!6,
+        align=left, inner sep=2.2mm, text=black
+    }
+]
+    \node[panel, minimum width=47mm, minimum height=38mm, anchor=north west] (adpanel) at (0,0) {};
+    \node[anchor=north west, font=\scriptsize\bfseries, text=blue!65!black]
+        at ([xshift=2mm,yshift=-2mm]adpanel.north west) {ad support};
+    \node[adbox, anchor=north west] at ([xshift=3mm,yshift=-9mm]adpanel.north west)
+        {$a_1$\hfill{\tiny thin}};
+    \node[selected, anchor=north west] at ([xshift=3mm,yshift=-18mm]adpanel.north west)
+        {$a^{(t)}$\hfill{\tiny sampled}};
+    \node[adbox, anchor=north west] at ([xshift=3mm,yshift=-27mm]adpanel.north west)
+        {$a_3$\hfill{\tiny thin}};
+
+    \node[panel, minimum width=61mm, minimum height=38mm, anchor=north west]
+        (curvepanel) at ([xshift=8mm]adpanel.north east) {};
+    \node[anchor=north west, font=\scriptsize\bfseries, text=blue!65!black]
+        at ([xshift=2mm,yshift=-2mm]curvepanel.north west)
+        {bid support: $b\mapsto \prob(\mathrm{win}\mid \vx_{\mathrm{ctx}},a,b)$};
+
+    \begin{scope}[shift={([xshift=7mm,yshift=-29mm]curvepanel.north west)}, x=1cm, y=1cm]
+        \draw[black!60, line width=0.7pt] (0,0) -- (4.8,0);
+        \draw[black!60, line width=0.7pt] (0,0) -- (0,2.15);
+        \node[anchor=west, font=\tiny\bfseries, text=black!55] at (0.05,2.0) {$\prob(\mathrm{win})$};
+        \node[anchor=west, font=\tiny\bfseries, text=black!55] at (4.25,-0.25) {bid $b$};
+        \draw[blue!70!black, line width=1.3pt]
+            (0.05,0.18)
+            .. controls (1.15,0.25) and (1.95,0.95) ..
+            (2.65,1.35)
+            .. controls (3.35,1.78) and (4.05,1.90) ..
+            (4.75,1.92);
+        \fill[green!50!black] (2.35,1.22) circle (0.09);
+        \draw[green!50!black, dashed, line width=0.7pt] (2.35,0) -- (2.35,1.22);
+        \node[anchor=west, font=\scriptsize\bfseries] at (2.52,1.20) {observed $b^{(t)}$};
+        \draw[red!60!black, line width=0.9pt] (0.90,0.38) circle (0.075);
+        \draw[red!60!black, line width=0.9pt] (3.95,1.88) circle (0.075);
+        \node[font=\tiny\bfseries, text=black!55] at (0.95,0.65) {not tried};
+        \node[font=\tiny\bfseries, text=black!55] at (4.25,1.62) {not tried};
+    \end{scope}
+
+    \node[font=\Large\bfseries, below=8mm of adpanel.south east, anchor=north]
+        (joint) {$(a,b)\sim \pi(a,b\mid \vx_{\mathrm{ctx}}, \text{candidate ads})$};
+
+    \node[note, below=4mm of joint, minimum width=76mm]
+        {\textbf{Ad choice and bid choice are coupled.}\\
+         \textbf{No canonical randomized analogue for joint $(a,b)$ policies.}};
+\end{tikzpicture}
+\end{frame}
+
 % frame-id: new-values-new-dimensions
 \begin{frame}[t]{New values, new dimensions}
 \vspace{-0.4em}
